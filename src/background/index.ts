@@ -14,9 +14,7 @@ const s = "😀";
     const arg = { s: "", color, targetWords };
     await disableCodeTag(target, arg);
     await convertWords(target, arg);
-  }
-
-  if (command === "conv") {
+  } else if (command === "conv") {
     await disableCodeTag(target, arg);
     await convertWords(target, arg);
   } else if (command === "re") {
@@ -25,7 +23,7 @@ const s = "😀";
     throw Error("not supported command");
   }
 
-  await execute(target, (command: string) => {
-    console.log(command);
-  }, command)
+  // await execute(target, (command: string) => {
+  //   console.log(command);
+  // }, command)
 });
