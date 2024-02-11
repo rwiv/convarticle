@@ -1,25 +1,19 @@
 {
   "manifest_version": 3,
-  "name": "<name in manifest.json>",
-  "description": "<description in manifest.json>",
-  "options_ui": {
-    "page": "src/pages/options/index.html"
-  },
-  "background": {
-    "service_worker": "src/pages/background/index.ts",
-    "type": "module"
-  },
-  "action": {
-    "default_popup": "src/pages/popup/index.html",
-    "default_icon": {
-      "32": "icon-32.png"
-    }
-  },
+  "name": "convarticle",
+  "description": "convert articles",
   "icons": {
     "128": "icon-128.png"
   },
-  "permissions": [
-    "activeTab"
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "contentStyle.css",
+        "icon-128.png",
+        "icon-32.png"
+      ],
+      "matches": []
+    }
   ],
   "content_scripts": [
     {
@@ -36,22 +30,44 @@
       ]
     }
   ],
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "contentStyle.css",
-        "icon-128.png",
-        "icon-32.png"
-      ],
-      "matches": []
-    }
-  ],
   "commands": {
-    "_execute_action": {
+    "base": {
       "suggested_key": {
-        "default": "Ctrl+B",
-        "mac": "Command+B"
-      }
+        "default": "Ctrl+B"
+      },
+      "description": "base"
+    },
+    "conv": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Z"
+      },
+      "description": "conv"
+    },
+    "re": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+X"
+      },
+      "description": "re"
     }
-  }
+  },
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "src/pages/popup/index.html",
+    "default_icon": {
+      "32": "icon-32.png"
+    }
+  },
+  "options_ui": {
+    "page": "src/pages/options/index.html"
+  },
+  "permissions": [
+    "activeTab", "scripting"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ]
 }
