@@ -18,7 +18,7 @@ export const disableCodeTag = (tab: chrome.tabs.Tab, arg: Arg) => execute(tab, (
   const {s, color} = arg;
   const codes = toArray(document.querySelectorAll("code"));
   const filtered = codes.filter(elem => elem.childNodes.length === 1);
-  const regex = RegExp("(<code.*>)(.+?)(</code>)", "ig")
+  const regex = RegExp("(<code.*?>)(.*?)(</code>)", "ig")
   const before = `<span style="color:${color}">${s}$2${s}</span>`
   for (const elem of filtered) {
     const parent = elem.parentElement;
@@ -29,7 +29,7 @@ export const disableCodeTag = (tab: chrome.tabs.Tab, arg: Arg) => execute(tab, (
 
 export const convertWords = (tab: chrome.tabs.Tab, arg: Arg) => execute(tab, (arg: Arg) => {
   const { s, targetWords } = arg;
-  const target = document.querySelector("article");
+  const target = document.querySelector("body");
   if (target === null) throw Error("element is null");
   for (const word of targetWords) {
     target.innerHTML = target
