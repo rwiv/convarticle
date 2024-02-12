@@ -4,11 +4,14 @@ import {AppConfigs, appConfigs} from "@src/config/app_configs";
 export interface Arg {
   s: string;
   targetWords: string[];
-  className: string;
+  codeClassName: string;
+  conceptClassName: string;
 }
 
 export const disableCodeTag = (tab: chrome.tabs.Tab, arg: Arg) => execute(tab, async (arg: Arg, appConfigs: AppConfigs) => {
-  function getBefore(inner: string) {
+  const {s, codeClassName, conceptClassName, targetWords } = arg;
+
+  function getBefore(inner: string, className: string) {
     return `<span class="${className}">${s}${inner}${s}</span>`;
   }
 
@@ -16,7 +19,6 @@ export const disableCodeTag = (tab: chrome.tabs.Tab, arg: Arg) => execute(tab, a
   if (body === null) throw Error("element is null");
 
   // disable <code> tag
-  const {s, className, targetWords } = arg;
   const regex = RegExp("<code.*?>(.*?)</code>", "ig")
 
   let result = body.outerHTML;
@@ -33,18 +35,17 @@ export const disableCodeTag = (tab: chrome.tabs.Tab, arg: Arg) => execute(tab, a
     const innerRegex = RegExp("<(.*?)>(.*?)</(.*?)>", "i");
     const innerMatch = innerRegex.exec(reMatch[1])
     if (innerMatch !== null) {
-      const ignoreTags = ["strong"];
-      if (ignoreTags.filter(it => innerMatch[1].includes(it)).length === 0) {
+      if (appConfigs.ignoreTags.filter(it => innerMatch[1].includes(it)).length === 0) {
         continue;
       }
     }
 
-    result = result.replace(match, getBefore(reMatch[1]));
+    result = result.replace(match, getBefore(reMatch[1], codeClassName));
   }
 
   // convert words
   for (const word of targetWords) {
-    result = result.replace(RegExp(`\\b(${word})\\b`, "ig"), getBefore("$1"));
+    result = result.replace(RegExp(`\\b(${word})\\b`, "ig"), getBefore("$1", conceptClassName));
   }
 
   // last processing

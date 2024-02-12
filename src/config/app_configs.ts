@@ -1,5 +1,6 @@
 export interface AppConfigs {
   storageKey: StorageKey;
+  ignoreTags: string[];
 }
 
 interface StorageKey {
@@ -17,5 +18,6 @@ export const appConfigs: AppConfigs = {
     stateKey: "state",
     targetWords: "targetWords",
     match: "match",
-  }
+  },
+  ignoreTags: ["strong"],
 }

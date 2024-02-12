@@ -17,12 +17,34 @@ chrome.commands.onCommand.addListener(async (command) => {
 
   const s = "😀";
   // const s = "";
-  const className = "new-code";
-  const arg: Arg = { s, targetWords: targetWordValue, className };
+  const codeClassName = "new-code";
+  const conceptClassName = "concept";
+  const arg: Arg = { s, targetWords: targetWordValue, codeClassName, conceptClassName };
+
+  // const css = `
+  //   .${className} {
+  //     background-color: #fff;
+  //     border: 1px solid #e1e1e8;
+  //     border-radius: 0;
+  //     color: #009;
+  //     font-size: .95em;
+  //     font-weight: 400;
+  //     padding: 0.125em 0.25em;
+  //   }
+  // `;
+
+  // const css = `
+  //   .${codeClassName} {
+  //     color: #009;
+  //   }
+  //   .${conceptClassName} {
+  //     color: blue;
+  //   }
+  // `;
 
   const css = `
-    .${className} {
-      color: blue;
+    .${codeClassName} {
+      color: #009;
     }
   `;
 
