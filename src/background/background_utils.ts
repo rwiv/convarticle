@@ -14,3 +14,9 @@ export async function findActiveTab() {
   }
   return filtered[0];
 }
+
+export function println(target:chrome.tabs.Tab, msg: any) {
+  return execute(target, (msg: string) => {
+    console.log(msg);
+  }, msg);
+}

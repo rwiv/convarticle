@@ -48,6 +48,12 @@
         "default": "Ctrl+Shift+X"
       },
       "description": "re"
+    },
+    "change": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+V"
+      },
+      "description": "change"
     }
   },
   "background": {
@@ -64,7 +70,7 @@
     "page": "src/pages/options/index.html"
   },
   "permissions": [
-    "activeTab", "scripting"
+    "activeTab", "scripting", "storage"
   ],
   "host_permissions": [
     "http://*/*",

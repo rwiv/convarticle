@@ -1,24 +1,62 @@
-import React from 'react';
-import logo from '@assets/img/logo.svg';
+import React, {ChangeEventHandler, useEffect, useState} from 'react';
+import {appConfigs} from "@src/config/app_configs";
 
 export default function Popup(): JSX.Element {
   return (
-    <div className="absolute top-0 left-0 right-0 bottom-0 text-center h-full p-3 bg-gray-800">
-      <header className="flex flex-col items-center justify-center text-white">
-        <img src={logo} className="h-36 pointer-events-none animate-spin-slow" alt="logo" />
-        <p>
-          Edit <code>src/pages/popup/Popup.jsx</code> and save to reload.
-        </p>
-        <a
-          className="text-blue-400"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React!
-        </a>
-        <p>Popup styled with TailwindCSS!</p>
-      </header>
+    <div>
+      <TestComp />
     </div>
   );
+}
+
+function TestComp() {
+
+  const [list, setList] = useState<string[]>([]);
+  const [input, setInput] = useState("");
+
+  const { targetWords } = appConfigs.storageKey;
+
+  useEffect(() => {
+    chrome.storage.local.get([targetWords]).then(async data => {
+      let list = data[targetWords]
+      if (list === undefined) {
+        list = [];
+        await chrome.storage.local.set({ [targetWords]: list });
+      }
+      setList(list);
+    })
+  }, []);
+
+  const download = (data: string) => {
+    const blob = new Blob([data], { type: 'text/plain' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "result.txt"
+    a.click()
+    a.remove()
+    window.URL.revokeObjectURL(url);
+  }
+
+  const onAdd = async (elem: string) => {
+    const data = await chrome.storage.local.get([targetWords]);
+    const result = [...data[targetWords], elem];
+    await chrome.storage.local.set({ [targetWords]: result });
+    setList(result);
+    setInput("");
+  }
+
+  const onChange: ChangeEventHandler<HTMLInputElement> = async (e) => {
+    setInput(e.target.value);
+  }
+
+  return (
+    <>
+      {list.length > 0 && list.map((elem, idx) => (
+        <div key={idx}>{elem}</div>
+      ))}
+      <input onChange={onChange} value={input} />
+      <button onClick={() => onAdd(input)}>add</button>
+    </>
+  )
 }
