@@ -31,12 +31,6 @@
     }
   ],
   "commands": {
-    "base": {
-      "suggested_key": {
-        "default": "Ctrl+B"
-      },
-      "description": "base"
-    },
     "conv": {
       "suggested_key": {
         "default": "Ctrl+Shift+Z"
@@ -51,7 +45,7 @@
     },
     "change": {
       "suggested_key": {
-        "default": "Ctrl+Shift+V"
+        "default": "Ctrl+Q"
       },
       "description": "change"
     }
