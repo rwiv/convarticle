@@ -50,7 +50,7 @@ async function save(target: chrome.tabs.Tab, key: string) {
   return execute(target, (key: string) => {
     const body = document.querySelector("body");
     if (body === null) throw Error("body is null");
-    return chrome.storage.local.set({ [key]: body.innerHTML });
+    return chrome.storage.local.set({ [key]: body.outerHTML });
   }, key);
 }
 
@@ -66,7 +66,7 @@ async function change(target: chrome.tabs.Tab) {
     const data = await chrome.storage.local.get([next]);
     const body = document.querySelector("body");
     if (body === null) throw Error("body is null");
-    body.innerHTML = data[next];
+    body.outerHTML = data[next];
 
     await chrome.storage.local.set({ [stateKey]: next });
   }, appConfigs);

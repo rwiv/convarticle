@@ -8,39 +8,48 @@ export interface Arg {
 }
 
 export const disableCodeTag = (tab: chrome.tabs.Tab, arg: Arg) => execute(tab, async (arg: Arg, appConfigs: AppConfigs) => {
-  function toArray<T extends ChildNode>(nodes: NodeListOf<T>): T[] {
-    const result = [];
-    for (let i = 0; i < nodes.length; i++) {
-      result.push(nodes[i]);
-    }
-    return result;
+  function getBefore(inner: string) {
+    return `<span class="${className}">${s}${inner}${s}</span>`;
   }
 
-  // disable <code> tag
   const body = document.querySelector("body");
   if (body === null) throw Error("element is null");
 
-  const codes = toArray(document.querySelectorAll("code"));
-  const filtered = codes.filter(elem => elem.childNodes.length === 1);
-
+  // disable <code> tag
   const {s, className, targetWords } = arg;
   const regex = RegExp("<code.*?>(.*?)</code>", "ig")
-  const before = `<span class="${className}">${s}$1${s}</span>`;
 
-  for (const elem of filtered) {
-    elem.outerHTML = elem.outerHTML.replace(regex, before);
+  let result = body.outerHTML;
+
+  const m = result.match(regex);
+  if (m === null) throw Error("regex match failure");
+  for (const match of m) {
+    const regex = RegExp("<code.*?>(.*?)</code>", "i")
+    const reMatch = regex.exec(match);
+    if (reMatch === null || reMatch.length < 1) {
+      continue;
+    }
+
+    const innerRegex = RegExp("<(.*?)>(.*?)</(.*?)>", "i");
+    const innerMatch = innerRegex.exec(reMatch[1])
+    if (innerMatch !== null) {
+      const ignoreTags = ["strong"];
+      if (ignoreTags.filter(it => innerMatch[1].includes(it)).length === 0) {
+        continue;
+      }
+    }
+
+    result = result.replace(match, getBefore(reMatch[1]));
   }
 
   // convert words
-  let result = body.innerHTML;
   for (const word of targetWords) {
-    result = result.replace(RegExp(`\\b(${word})\\b`, "ig"), `${s}$1${s}`);
+    result = result.replace(RegExp(`\\b(${word})\\b`, "ig"), getBefore("$1"));
   }
 
   // last processing
   const matched = result.match(RegExp(`${s}.*?${s}`, "gi"));
   if (matched === null) throw Error("match is null");
-  console.log(matched)
 
   const { match } = appConfigs.storageKey;
   const convertedMap: any = {};
@@ -53,7 +62,7 @@ export const disableCodeTag = (tab: chrome.tabs.Tab, arg: Arg) => execute(tab, a
 
   await chrome.storage.local.set({ [match]: convertedMap });
 
-  body.innerHTML = result;
+  body.outerHTML = result;
 }, arg, appConfigs);
 
 export const re = (tab: chrome.tabs.Tab, arg: Arg) => execute(tab, async (arg: Arg, appConfigs: AppConfigs) => {
@@ -64,10 +73,10 @@ export const re = (tab: chrome.tabs.Tab, arg: Arg) => execute(tab, async (arg: A
   const target = document.querySelector("body");
   if (target === null) throw Error("element is null");
 
-  let result = target.innerHTML;
+  let result = target.outerHTML;
   for (const elem of Object.keys(matchMap)) {
     result = result.replace(elem, matchMap[elem]);
   }
 
-  target.innerHTML = result;
+  target.outerHTML = result;
 }, arg, appConfigs);
