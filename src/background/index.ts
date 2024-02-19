@@ -1,5 +1,5 @@
 import {Arg, disableCodeTag, re} from "@src/background/convert_article";
-import {execute, findActiveTab} from "@src/background/background_utils";
+import {execute, findActiveTab, println} from "@src/background/background_utils";
 import {AppConfigs, appConfigs} from "@src/config/app_configs";
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -15,72 +15,72 @@ chrome.runtime.onInstalled.addListener(() => {
     title: "change",
     id: "change",
   });
+});
 
-  chrome.contextMenus.onClicked.addListener(async (info: chrome.contextMenus.OnClickData, target: chrome.tabs.Tab | undefined) => {
-    if (target === undefined) return;
+chrome.contextMenus.onClicked.addListener(async (info: chrome.contextMenus.OnClickData, target: chrome.tabs.Tab | undefined) => {
+  if (target === undefined) return;
 
-    const { temp1, temp2, targetWords } = appConfigs.storageKey;
-    const targetWordValue = await chrome.storage.local.get([targetWords]).then(async data => {
-      let value = data[targetWords];
-      if (value === undefined) {
-        value = [];
-        await chrome.storage.local.set({ [targetWords]: value });
-      }
-      return value;
-    });
+  const { temp1, temp2, targetWords } = appConfigs.storageKey;
+  const targetWordValue = await chrome.storage.local.get([targetWords]).then(async data => {
+    let value = data[targetWords];
+    if (value === undefined) {
+      value = [];
+      await chrome.storage.local.set({ [targetWords]: value });
+    }
+    return value;
+  });
 
-    const s = "😀";
-    // const s = "";
-    const codeClassName = "new-code";
-    const conceptClassName = "concept";
-    const arg: Arg = { s, targetWords: targetWordValue, codeClassName, conceptClassName };
+  const s = "😀";
+  // const s = "";
+  const codeClassName = "new-code";
+  const conceptClassName = "concept";
+  const arg: Arg = { s, targetWords: targetWordValue, codeClassName, conceptClassName };
 
-    // const css = `
-    //   .${className} {
-    //     background-color: #fff;
-    //     border: 1px solid #e1e1e8;
-    //     border-radius: 0;
-    //     color: #009;
-    //     font-size: .95em;
-    //     font-weight: 400;
-    //     padding: 0.125em 0.25em;
-    //   }
-    // `;
+  // const css = `
+  //   .${className} {
+  //     background-color: #fff;
+  //     border: 1px solid #e1e1e8;
+  //     border-radius: 0;
+  //     color: #009;
+  //     font-size: .95em;
+  //     font-weight: 400;
+  //     padding: 0.125em 0.25em;
+  //   }
+  // `;
 
-    // const css = `
-    //   .${codeClassName} {
-    //     color: #009;
-    //   }
-    //   .${conceptClassName} {
-    //     color: blue;
-    //   }
-    // `;
+  // const css = `
+  //   .${codeClassName} {
+  //     color: #009;
+  //   }
+  //   .${conceptClassName} {
+  //     color: blue;
+  //   }
+  // `;
 
-    const css = `
+  const css = `
     .${codeClassName} {
       color: #009;
     }
   `;
 
-    await chrome.scripting.insertCSS({ target: { tabId: target.id! }, css });
+  await chrome.scripting.insertCSS({ target: { tabId: target.id! }, css });
 
-    switch (info.menuItemId) {
-      case "conv":
-        await save(target, temp1);
-        await disableCodeTag(target, arg);
-        // await convertWords(target, arg);
-        break;
-      case "re":
-        await re(target, arg);
-        await save(target, temp2);
-        break;
-      case "change":
-        await change(target);
-        break;
-      default:
-        throw Error("not supported command");
-    }
-  })
+  switch (info.menuItemId) {
+    case "conv":
+      await save(target, temp1);
+      await disableCodeTag(target, arg);
+      // await convertWords(target, arg);
+      break;
+    case "re":
+      await re(target, arg);
+      await save(target, temp2);
+      break;
+    case "change":
+      await change(target);
+      break;
+    default:
+      throw Error("not supported command");
+  }
 });
 
 chrome.commands.onCommand.addListener(async (command) => {
