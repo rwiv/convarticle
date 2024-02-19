@@ -31,21 +31,9 @@
     }
   ],
   "commands": {
-    "conv": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+Z"
-      },
-      "description": "conv"
-    },
-    "re": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+X"
-      },
-      "description": "re"
-    },
     "change": {
       "suggested_key": {
-        "default": "Ctrl+Q"
+        "default": "Ctrl+Shift+Q"
       },
       "description": "change"
     }
@@ -64,7 +52,7 @@
     "page": "src/pages/options/index.html"
   },
   "permissions": [
-    "activeTab", "scripting", "storage"
+    "activeTab", "scripting", "storage", "contextMenus"
   ],
   "host_permissions": [
     "http://*/*",
