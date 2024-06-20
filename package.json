@@ -13,6 +13,7 @@
   },
   "type": "module",
   "dependencies": {
+    "pluralize": "^8.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "webextension-polyfill": "^0.10.0"
@@ -21,6 +22,7 @@
     "@crxjs/vite-plugin": "^1.0.14",
     "@types/chrome": "^0.0.253",
     "@types/node": "^18.17.1",
+    "@types/pluralize": "^0.0.33",
     "@types/react": "^18.2.39",
     "@types/react-dom": "^18.2.17",
     "@types/webextension-polyfill": "^0.10.0",

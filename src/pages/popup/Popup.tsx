@@ -13,6 +13,7 @@ function TestComp() {
 
   const [list, setList] = useState<string[]>([]);
   const [input, setInput] = useState("");
+  const [inputInit, setInputInit] = useState("");
 
   const { targetWords } = appConfigs.storageKey;
 
@@ -27,17 +28,6 @@ function TestComp() {
     })
   }, []);
 
-  const download = (data: string) => {
-    const blob = new Blob([data], { type: 'text/plain' })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "result.txt"
-    a.click()
-    a.remove()
-    window.URL.revokeObjectURL(url);
-  }
-
   const onAdd = async (elem: string) => {
     const data = await chrome.storage.local.get([targetWords]);
     const result = [...data[targetWords], elem];
@@ -46,17 +36,56 @@ function TestComp() {
     setInput("");
   }
 
-  const onChange: ChangeEventHandler<HTMLInputElement> = async (e) => {
-    setInput(e.target.value);
+  const onDelete = async (elem: string) => {
+    const data = await chrome.storage.local.get([targetWords]);
+    const result = data[targetWords].filter((item: string) => item !== elem);
+    await chrome.storage.local.set({ [targetWords]: result });
+    setList(result);
+  }
+
+  const copyClipboard = async () => {
+    const data = await chrome.storage.local.get([targetWords]);
+    const json = JSON.stringify(data[targetWords]);
+    await navigator.clipboard.writeText(json);
+  }
+
+  const clear = async () => {
+    await chrome.storage.local.set({ [targetWords]: [] });
+    setList([]);
+  }
+
+  const init = async () => {
+    const list = JSON.parse(inputInit);
+    if (!(list instanceof Array)) {
+      throw Error("invalid json");
+    }
+    await chrome.storage.local.set({ [targetWords]: list });
+    setList(list);
+    setInputInit("");
   }
 
   return (
     <>
+      <div>
+        <input onChange={e => setInputInit(e.target.value)} value={inputInit}/>
+        <button className="bg-amber-400 p-2" onClick={() => init()}>init</button>
+      </div>
+      <div>
+        <button className="bg-amber-400 p-2" onClick={() => copyClipboard()}>copy</button>
+      </div>
+      <div>
+        <button className="bg-amber-400 p-2" onClick={() => clear()}>clear</button>
+      </div>
+      <div>
+        <input onChange={e => setInput(e.target.value)} value={input}/>
+        <button className="bg-amber-400 p-2" onClick={() => onAdd(input)}>add</button>
+      </div>
       {list.length > 0 && list.map((elem, idx) => (
-        <div key={idx}>{elem}</div>
+        <div key={idx}>
+          <span>{elem}</span>
+          <button className="bg-pink-600 p-2" onClick={() => onDelete(elem)}>x</button>
+        </div>
       ))}
-      <input onChange={onChange} value={input} />
-      <button onClick={() => onAdd(input)}>add</button>
     </>
   )
 }

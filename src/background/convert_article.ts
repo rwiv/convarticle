@@ -3,16 +3,21 @@ import {AppConfigs, appConfigs} from "@src/config/app_configs";
 
 export interface Arg {
   s: string;
+  w: string;
   targetWords: string[];
   codeClassName: string;
   conceptClassName: string;
 }
 
 export const disableCodeTag = (tab: chrome.tabs.Tab, arg: Arg) => execute(tab, async (arg: Arg, appConfigs: AppConfigs) => {
-  const {s, codeClassName, conceptClassName, targetWords } = arg;
+  const {s, w, codeClassName, conceptClassName, targetWords } = arg;
 
-  function getBefore(inner: string, className: string) {
+  function convertCode(inner: string, className: string) {
     return `<span class="${className}">${s}${inner}${s}</span>`;
+  }
+
+  function convertTargetWord(inner: string, className: string) {
+    return `<span class="${className}">${w}${inner}</span>`;
   }
 
   const body = document.querySelector("body");
@@ -40,44 +45,13 @@ export const disableCodeTag = (tab: chrome.tabs.Tab, arg: Arg) => execute(tab, a
       }
     }
 
-    result = result.replace(match, getBefore(reMatch[1], codeClassName));
+    result = result.replace(match, convertCode(reMatch[1], codeClassName));
   }
 
-  // convert words
+  // convert target words
   for (const word of targetWords) {
-    result = result.replace(RegExp(`\\b(${word})\\b`, "ig"), getBefore("$1", conceptClassName));
+    result = result.replace(RegExp(`\\b(${word})\\b`, "ig"), convertTargetWord("$1", conceptClassName));
   }
-
-  // last processing
-  const matched = result.match(RegExp(`${s}.*?${s}`, "gi"));
-  if (matched === null) throw Error("match is null");
-
-  const { match } = appConfigs.storageKey;
-  const convertedMap: any = {};
-  for (let i = 0; i < matched.length; i++) {
-    const converted = `{${i}}`;
-    const matchedElem = matched[i]
-    result = result.replace(matchedElem, converted);
-    convertedMap[converted] = matchedElem.replace(RegExp(s, "gi"), "");
-  }
-
-  await chrome.storage.local.set({ [match]: convertedMap });
 
   body.outerHTML = result;
-}, arg, appConfigs);
-
-export const re = (tab: chrome.tabs.Tab, arg: Arg) => execute(tab, async (arg: Arg, appConfigs: AppConfigs) => {
-  const { match } = appConfigs.storageKey;
-  const matched = await chrome.storage.local.get([match]);
-  const matchMap = matched[match];
-
-  const target = document.querySelector("body");
-  if (target === null) throw Error("element is null");
-
-  let result = target.outerHTML;
-  for (const elem of Object.keys(matchMap)) {
-    result = result.replace(elem, matchMap[elem]);
-  }
-
-  target.outerHTML = result;
 }, arg, appConfigs);
