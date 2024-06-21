@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "target": "es2022",
     "types": ["vite/client", "node", "chrome"],
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": false,

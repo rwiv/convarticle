@@ -12,36 +12,23 @@ export interface Arg {
 export const disableCodeTag = (tab: chrome.tabs.Tab, arg: Arg) => execute(tab, async (arg: Arg, appConfigs: AppConfigs) => {
   const {s, w, codeClassName, conceptClassName, targetWords } = arg;
 
-  function convertCode(inner: string, className: string) {
-    return `<span class="${className}">${s}${inner}${s}</span>`;
-  }
-
-  function convertTargetWord(inner: string, className: string) {
-    return `<span class="${className}">${w}${inner}</span>`;
-  }
-
   const body = document.querySelector("body");
   if (body === null) throw Error("element is null");
-
-  let result = body.outerHTML;
+  let outerHTML = body.outerHTML;
 
   // disable <code> tag
-  const matches = result.match(RegExp("<code.*?>(.*?)</code>", "ig"));
-  if (matches === null) throw Error("regex match failure");
-  for (const match of matches) {
-    const regex = RegExp("<code.*?>(.*?)</code>", "i")
-    const reMatch = regex.exec(match);
-    if (reMatch === null || reMatch.length < 1) {
-      continue;
-    }
-
-    result = result.replace(match, convertCode(reMatch[1], codeClassName));
-  }
+  outerHTML = outerHTML.replaceAll(
+    /<code.*?>(.*?)<\/code>/ig,
+      `<span class="${codeClassName}">${s}$1${s}</span>`
+  )
 
   // convert target words
   for (const word of targetWords) {
-    result = result.replace(RegExp(`\\b(${word})\\b`, "ig"), convertTargetWord("$1", conceptClassName));
+    outerHTML = outerHTML.replaceAll(
+      RegExp(`\\b(${word})\\b`, "ig"),
+        `<span class="${conceptClassName}">${w}$1</span>`
+    );
   }
 
-  body.outerHTML = result;
+  body.outerHTML = outerHTML;
 }, arg, appConfigs);
