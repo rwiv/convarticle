@@ -23,26 +23,16 @@ export const disableCodeTag = (tab: chrome.tabs.Tab, arg: Arg) => execute(tab, a
   const body = document.querySelector("body");
   if (body === null) throw Error("element is null");
 
-  // disable <code> tag
-  const regex = RegExp("<code.*?>(.*?)</code>", "ig")
-
   let result = body.outerHTML;
 
-  const m = result.match(regex);
-  if (m === null) throw Error("regex match failure");
-  for (const match of m) {
+  // disable <code> tag
+  const matches = result.match(RegExp("<code.*?>(.*?)</code>", "ig"));
+  if (matches === null) throw Error("regex match failure");
+  for (const match of matches) {
     const regex = RegExp("<code.*?>(.*?)</code>", "i")
     const reMatch = regex.exec(match);
     if (reMatch === null || reMatch.length < 1) {
       continue;
-    }
-
-    const innerRegex = RegExp("<(.*?)>(.*?)</(.*?)>", "i");
-    const innerMatch = innerRegex.exec(reMatch[1])
-    if (innerMatch !== null) {
-      if (appConfigs.ignoreTags.filter(it => innerMatch[1].includes(it)).length === 0) {
-        continue;
-      }
     }
 
     result = result.replace(match, convertCode(reMatch[1], codeClassName));

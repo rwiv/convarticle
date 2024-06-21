@@ -32,14 +32,6 @@ export const disableCodeTag = (tab: chrome.tabs.Tab, arg: Arg) => execute(tab, a
       continue;
     }
 
-    const innerRegex = RegExp("<(.*?)>(.*?)</(.*?)>", "i");
-    const innerMatch = innerRegex.exec(reMatch[1])
-    if (innerMatch !== null) {
-      if (appConfigs.ignoreTags.filter(it => innerMatch[1].includes(it)).length === 0) {
-        continue;
-      }
-    }
-
     result = result.replace(match, getBefore(reMatch[1], codeClassName));
   }
 
